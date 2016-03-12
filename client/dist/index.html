@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head _wxhkphogpkobbkjccgfifhfjlahnoocnan_="shake_1.0">
+    <meta charset="utf-8">
+    <title>Todos</title>
+    <link rel="stylesheet" href="todos.css">
+</head>
+
+<body ng-app="todos">
+
+    <div id="todoapp" ng-controller="todoCtrl">
+
+        <header>
+            <h1>Todos</h1>
+            <input id="new-todo" type="text" placeholder="What needs to be done?" ng-keypress="save($event)" ng-model="inputVal"></header>
+
+        <section id="main" ng-show="todos.length">
+            <input id="toggle-all" type="checkbox" ng-click="toggleAll(markAll)" ng-model="markAll">
+            <label for="toggle-all">Mark all as complete</label>
+            <ul id="todo-list">
+                <li ng-class="{done: todo.checked, editing: todo.edit}" ng-repeat="todo in todos">
+                    <div class="view">
+                        <input class="toggle" type="checkbox" ng-click="toggle(todo)" ng-model="todo.checked">
+                        <label ng-bind="todo.label" ng-dblclick="todo.edit = true"></label>
+                        <a class="destroy" ng-click="destroy(todo)"></a>
+                    </div>
+                    <input class="edit" type="text" ng-model="todo.label" ng-keypress="updateLabel($event, todo)" ng-blur="updateLabel($event, todo)" auto-focus>
+                </li>
+            </ul>
+        </section>
+
+        <footer ng-show="todos.length">
+            <a id="clear-completed" ng-show="countDone()" ng-click="removeDone()">Clear {{doneNum}} completed {{doneNum == 1 ? 'item' : 'items' }}</a>
+            <div class="todo-count"> <b ng-bind="todos.length"></b>
+                item left
+            </div>
+        </footer>
+
+    </div>
+
+    <div id="instructions">Double-click to edit a todo.</div>
+
+    <div id="credits">
+        Created by
+        <br>
+        <a href="http://jgn.me/">Jérôme Gravel-Niquet</a>
+        .
+        <br>
+        Rewritten by:
+        <a href="http://addyosmani.github.com/todomvc">TodoMVC</a>
+        .
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

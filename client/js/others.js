@@ -1,0 +1,145 @@
+(function () {
+var app = angular.module("todos", []);
+var socket = io.connect('http://localhost:3000');
+socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+});
+app.controller("todoCtrl", ["$scope", "$http", function ($scope, $http) {
+    function fetchTodos() {
+        $http.get('/todo').success(function (res) {
+            $scope.todos = res;
+        });
+    }
+
+    function removeTodo(todo) {
+        return $http.delete('/todo' + '/' + todo._id);
+    }
+
+    function updateTodo(todo) {
+        return $http.put('/todo' + '/' + todo._id, todo);
+    }
+
+    $scope.save = function ($event) {
+        if ($event.keyCode !== 13 || !$scope.inputVal) {
+            return;
+        }
+        $http.post('/todo', {
+            label: $scope.inputVal,
+            checked: false
+        }).success(function (todo) {
+            $scope.todos.push({
+                _id: todo._id,
+                label: $scope.inputVal,
+                checked: false
+            });
+            socket.emit('client.add', {
+                _id: todo._id,
+                label: $scope.inputVal,
+                checked: false
+            });
+            $scope.inputVal = '';
+        });
+    };
+    socket.on('server.add', function (todo) {
+        console.log(todo);
+        $scope.todos.push(todo);
+        $scope.$apply();
+    });
+    socket.on('server.remove', function (todo) {
+        console.log(todo);
+        $scope.todos = _.reject($scope.todos, function (one) {
+            return one._id === todo._id;
+        });
+        $scope.$apply();
+    });
+
+    $scope.destroy = function (todo) {
+        removeTodo(todo).then(function () {
+            socket.emit('client.remove', todo);
+            $scope.todos = _.without($scope.todos, todo);
+        });
+    };
+
+    $scope.toggle = function (todo) {
+        updateTodo(todo);
+    };
+
+    $scope.toggleAll = function (checked) {
+        checked = !checked;
+        $http.put('/todo', {checked : checked}).then(function () {
+            for (var i = 0, len = $scope.todos.length; i < len; i++) {
+                $scope.todos[i].checked = checked;
+            }
+        });
+    };
+
+    $scope.countDone = function () {
+        $scope.doneNum = _.filter($scope.todos, function(todo) {
+            return todo.checked === true;
+        }).length;
+        if ($scope.doneNum === $scope.todos.length) {
+            $scope.markAll = true;
+        } else {
+            $scope.markAll = false;
+        }
+        return $scope.doneNum;
+    };
+
+    $scope.removeDone = function () {
+        $http.delete('/todo', {params: {checked : true}}).then(function () {
+            $scope.todos = _.filter($scope.todos, function(todo) {
+                return todo.checked !== true;
+            });
+        });
+    };
+
+    $scope.updateLabel = function($event, todo) {
+        if ($event.keyCode !== 13 &&
+                $event.type !== 'blur') {
+            return;
+        }
+        updateTodo(todo).then(function () {
+            todo.edit = false;
+        });
+    };
+
+    $scope.todos = [];
+    $scope.doneNum = 0;
+    fetchTodos();
+    socket.on('server.change', fetchTodos);
+}]);
+app.config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.interceptors.push((function () {
+        var interceptor = function ($timeout, $q) {
+            return {
+                'response' : function (opt) {
+                    console.log(opt);
+                    if (opt.config.method !== 'GET') {
+                        socket.emit('client.change');
+                    }
+                    //socket.emit('client.change');
+                    return opt;
+                }
+            };
+        };
+        interceptor.$inject = ['$timeout', '$q'];
+        return interceptor;
+    }()));
+}]);
+app.directive('autoFocus', function () {
+    return {
+        link : function (scope, el) {
+            scope.$watch('todo.edit', function (edit) {
+                console.log(edit);
+                if (edit === false) {
+                    return;
+                }
+                setTimeout(function () {
+                    el[0].focus();
+                }, 75);
+            })
+        }
+    }
+});
+})();

@@ -1,0 +1,15 @@
+{
+  "name": "jsleaning-todos",
+  "version": "0.0.0",
+  "main": "app.js",
+  "dependencies": {
+    "express": ">= 4.12.3",
+    "express-mongoose": ">= 0.1.0",
+    "body-parser": ">= 1.12.3",
+    "mongoose": ">= 4.0.2"
+  },
+  "private": true,
+  "devDependencies": {
+    "socket.io": "^1.4.5"
+  }
+}

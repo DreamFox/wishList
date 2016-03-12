@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=640,user-scalable=0,target-densitydpi=device-dpi">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no" />
+    <title>DreamFox's Wish List</title>
+    <!-- build:css todos.css -->
+    <link rel="stylesheet" href="todos.css"></head>
+     <!-- endbuild -->
+</head>
+
+<body ng-app="todos">
+
+    <div id="todoapp" ng-controller="todoCtrl">
+
+        <header>
+            <h1>梦想心愿单</h1>
+            <input id="new-todo" type="text" placeholder="添加一个心愿" ng-keypress="save($event)" ng-model="inputVal"></header>
+
+        <section id="main" ng-show="todos.length">
+            <input id="toggle-all" type="checkbox" ng-click="toggleAll(markAll)" ng-model="markAll">
+            <label for="toggle-all">标记都完成</label>
+            <ul id="todo-list">
+                <li ng-class="{done: todo.checked, editing: todo.edit}" ng-repeat="todo in todos">
+                    <div class="view">
+                        <input class="toggle" type="checkbox" ng-click="toggle(todo)" ng-model="todo.checked">
+                        <label ng-bind="todo.label" ng-dblclick="todo.edit = true"></label>
+                        <a class="destroy" ng-click="destroy(todo)"></a>
+                    </div>
+                    <input class="edit" type="text" ng-model="todo.label" ng-keypress="updateLabel($event, todo)" ng-blur="updateLabel($event, todo)" auto-focus>
+                </li>
+            </ul>
+        </section>
+
+        <footer ng-show="todos.length">
+            <a id="clear-completed" ng-show="countDone()" ng-click="removeDone()">Clear {{doneNum}} completed {{doneNum == 1 ? 'item' : 'items' }}</a>
+            <div class="todo-count"> <b ng-bind="todos.length"></b>
+                item left
+            </div>
+        </footer>
+
+    </div>
+
+    <div id="instructions">Double-click to edit a wish.</div>
+
+    <div id="credits">
+        Created by DreamFox
+    </div>
+    <!-- build:js main.js -->
+    <script type="text/javascript" src="js/underscore.js"></script>
+    <script type="text/javascript" src="js/angular.js"></script>
+    <script type="text/javascript" src="js/socket.io.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <!-- endbuild -->
+</body>
+</html>
