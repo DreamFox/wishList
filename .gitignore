@@ -14,3 +14,5 @@ hs_err_pid*
 **/**/node_modules
 **/**/bower_components
 /client/bower_components
+**/**/.tmp
+/client/.tmp
