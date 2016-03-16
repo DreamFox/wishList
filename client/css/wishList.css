@@ -12,7 +12,12 @@ body {
     margin: 0 auto;
     -webkit-font-smoothing: antialiased;
 }
-
+.wish-hint {
+    color: #aaa;
+}
+.hint {
+    text-align: center;
+}
 #todoapp {
     background: #fff;
     padding: 20px;
@@ -63,7 +68,7 @@ body {
 }
 
 #todo-list li {
-    padding: 18px 20px 18px 0;
+    padding: 18px 60px 18px 0;
     position: relative;
     font-size: 24px;
     border-bottom: 1px solid #cccccc;
@@ -81,7 +86,6 @@ body {
     position: absolute;
     right: 45px;
     top: 20px;
-    display: none;
     cursor: pointer;
     width: 20px;
     height: 20px;
@@ -91,7 +95,6 @@ body {
     position: absolute;
     right: 5px;
     top: 20px;
-    display: none;
     cursor: pointer;
     width: 20px;
     height: 20px;
@@ -195,7 +198,6 @@ body {
 #instructions {
     margin: 10px auto;
     color: #777777;
-    text-shadow: rgba(255, 255, 255, 0.8) 0 1px 0;
     text-align: center;
 }
 
@@ -206,10 +208,46 @@ body {
 #credits {
     margin: 30px auto;
     color: #999;
-    text-shadow: rgba(255, 255, 255, 0.8) 0 1px 0;
     text-align: center;
 }
 
 #credits a {
     color: #888;
+}
+.donor {
+    color: #aaa;
+}
+.dialog-text {
+    width: 80%;
+    font-size: 16px;
+    font-family: inherit;
+    line-height: 1.4em;
+    border: 0;
+    outline: none;
+    padding: 6px;
+    border: 1px solid #999999;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+    -moz-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+    -ms-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+    -o-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+}
+button {
+    border: none;
+}
+.confirm {
+    margin: 20px 0 0;
+}
+.btns {
+    cursor: pointer;
+    display: inline-block;
+    min-width: 100px;
+    height: 40px;
+    padding: 0 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    line-height: 40px;
+    text-align: center;
+    color: #fff;
+    background: #0094FF;
 }

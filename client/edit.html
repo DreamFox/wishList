@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/font-awesome.css">
     <link rel="stylesheet" href="css/ngDialog.css">
     <link rel="stylesheet" href="css/ngDialog-theme-default.css">
+    <link rel="stylesheet" href="css/ngDialog-theme-plain.css">
      <!-- endbuild -->
 </head>
 
@@ -31,8 +32,9 @@
                     <div class="view">
                         <input class="toggle" type="checkbox" ng-click="toggle(todo)" ng-model="todo.checked">
                         <label ng-bind="todo.label" ng-dblclick="todo.edit = true"></label>
+                        <span class="donor" ng-show="todo.donor">({{todo.donor}}已认领)</span>
                         <a href="{{todo.link}}" target="_blank" class="gift-link" ng-if="todo.link">商品链接</a>
-                        <a class="add-link fa fa-chain" ng-click="addLink(todo)"></a>
+                        <a class="add-link fa fa-chain" ng-click="addLink(todo)" title="添加商品链接"></a>
                         <a class="destroy fa fa-remove" ng-click="destroy(todo)"></a>
                     </div>
                     <input class="edit" type="text" ng-model="todo.label" ng-keypress="updateLabel($event, todo)" ng-blur="updateLabel($event, todo)" auto-focus>
@@ -49,11 +51,11 @@
 
     </div>
 
-    <div id="instructions" ng-click="editInfo(info)">
-    编辑个人信息
+    <div id="instructions" >
+    <p class="btns" ng-click="editInfo(info)">编辑个人信息</p>
     <div class="personal-info">
         <p ng-bind="'姓名：' + info.name"></p>
-        <p ng-bind="'电话' + info.phone"></p>
+        <p ng-bind="'电话：' + info.phone"></p>
         <p ng-bind="'收货地址：' + info.address"></p>
     </div>
     </div>
@@ -62,25 +64,25 @@
         Created by DreamFox
     </div>
     <script type="text/ng-template" id="linkDialog">
-        <p>输入商品链接</p>
-        <input type="text" class="link-text" ng-model="linkAdd" />
+        <p class="item-label">输入商品链接</p>
+        <input type="text" class="dialog-text" ng-model="linkAdd" />
         <br/>
-        <button class="confirm" ng-click="submit()">确定</button>
+        <button class="confirm btns" ng-click="submit()">确定</button>
     </script>
     <script type="text/ng-template" id="infoDialog">
-        <p>姓名</p>
-        <input type="text" class="link-text" ng-model="info.name" />
-        <p>手机</p>
-        <input type="text" class="link-text" ng-model="info.phone" />
-        <p>收货地址</p>
-        <input type="text" class="link-text" ng-model="info.address" />
+        <p class="item-label">姓名</p>
+        <input type="text" class="dialog-text" ng-model="info.name" />
+        <p class="item-label">手机</p>
+        <input type="text" class="dialog-text" ng-model="info.phone" />
+        <p class="item-label">收货地址</p>
+        <input type="text" class="dialog-text" ng-model="info.address" />
         <br/>
-        <button class="confirm" ng-click="submit()">提交</button>
+        <button class="confirm btns" ng-click="submit()">提交</button>
     </script>
     <!-- build:js main.js -->
     <script type="text/javascript" src="js/underscore.js"></script>
     <script type="text/javascript" src="js/angular.js"></script>
-    <script type="text/javascript" src="js/ngDialog.min.js"></script>
+    <script type="text/javascript" src="js/ngDialog.js"></script>
     <script type="text/javascript" src="js/socket.io.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
     <!-- endbuild -->

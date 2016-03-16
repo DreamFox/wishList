@@ -1,30 +1,42 @@
 (function () {
-var app = angular.module("todos", []);
-var socket = io.connect('http://localhost:3000');
+var app = angular.module("todos", ['ngDialog']);
+var socket = io.connect('http://172.16.2.26:3000');
 socket.on('news', function (data) {
     console.log(data);
     socket.emit('my other event', { my: 'data' });
 });
-app.controller("todoCtrl", ["$scope", "$http", function ($scope, $http) {
+app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
+        function ($scope, $http, ngDialog) {
     function fetchTodos() {
-        $http.get('/todo').success(function (res) {
+        $http.get('/gift').success(function (res) {
             $scope.todos = res;
+        });
+    }
+    function fetchInfo() {
+        $http.get('/info/dreamfox').success(function (res) {
+            console.log(res);
+            $scope.info = res;
         });
     }
 
     function removeTodo(todo) {
-        return $http.delete('/todo' + '/' + todo._id);
+        return $http.delete('/gift' + '/' + todo._id);
     }
 
     function updateTodo(todo) {
-        return $http.put('/todo' + '/' + todo._id, todo);
+        return $http.put('/gift' + '/' + todo._id, todo);
+    }
+
+    function updateInfo(info) {
+        console.log('put info', info);
+        return $http.put('/info/dreamfox', info);
     }
 
     $scope.save = function ($event) {
         if ($event.keyCode !== 13 || !$scope.inputVal) {
             return;
         }
-        $http.post('/todo', {
+        $http.post('/gift', {
             label: $scope.inputVal,
             checked: false
         }).success(function (todo) {
@@ -41,18 +53,18 @@ app.controller("todoCtrl", ["$scope", "$http", function ($scope, $http) {
             $scope.inputVal = '';
         });
     };
-    socket.on('server.add', function (todo) {
-        console.log(todo);
+    /*socket.on('server.add', function (todo) {
+        console.log('add:', todo);
         $scope.todos.push(todo);
         $scope.$apply();
-    });
-    socket.on('server.remove', function (todo) {
+    });*/
+    /*socket.on('server.remove', function (todo) {
         console.log(todo);
         $scope.todos = _.reject($scope.todos, function (one) {
             return one._id === todo._id;
         });
         $scope.$apply();
-    });
+    });*/
 
     $scope.destroy = function (todo) {
         removeTodo(todo).then(function () {
@@ -62,12 +74,48 @@ app.controller("todoCtrl", ["$scope", "$http", function ($scope, $http) {
     };
 
     $scope.toggle = function (todo) {
-        updateTodo(todo);
+        if (todo.checked) {
+            ngDialog.openConfirm({
+                template: 'donorDialog',
+                scope: $scope,
+                appendClassName: 'donor-dialog',
+                controller: ['$scope', function ($scope) {
+                    $scope.submit = function () {
+                        todo.donor = $scope.donorName;
+                        console.log(todo.donor);
+                        updateTodo(todo).then(function () {
+                            $scope.confirm($scope.donorName);
+                        });
+                    };
+                }]
+            }).then(function (name) {
+                $scope.donorName = name;
+                localStorage.setItem('donorName', name);
+                ngDialog.open({
+                    template: '<p class="hint">页面底部可以看到DreamFox的收货地址喔</p>',
+                    plain: true
+                });
+            }).catch(function () {
+                todo.checked = false;
+            });
+        } else {
+            var donor = localStorage.getItem('donorName');
+            if (donor && donor == todo.donor) {
+                todo.donor = '';
+                updateTodo(todo);
+            } else if (todo.donor) {
+                todo.checked = true;
+                ngDialog.open({
+                    template: '<p class="hint">抱歉，不是您认领的心愿不能取消</p>',
+                    plain: true
+                });
+            }
+        }
     };
 
     $scope.toggleAll = function (checked) {
         checked = !checked;
-        $http.put('/todo', {checked : checked}).then(function () {
+        $http.put('/gift', {checked : checked}).then(function () {
             for (var i = 0, len = $scope.todos.length; i < len; i++) {
                 $scope.todos[i].checked = checked;
             }
@@ -87,7 +135,7 @@ app.controller("todoCtrl", ["$scope", "$http", function ($scope, $http) {
     };
 
     $scope.removeDone = function () {
-        $http.delete('/todo', {params: {checked : true}}).then(function () {
+        $http.delete('/gift', {params: {checked : true}}).then(function () {
             $scope.todos = _.filter($scope.todos, function(todo) {
                 return todo.checked !== true;
             });
@@ -104,17 +152,55 @@ app.controller("todoCtrl", ["$scope", "$http", function ($scope, $http) {
         });
     };
 
+    $scope.addLink = function (todo) {
+        ngDialog.open({
+            template: 'linkDialog',
+            appendClassName: 'link-dialog',
+            controller: ['$scope', function ($scope) {
+                $scope.linkAdd = todo.link;
+                $scope.submit = function () {
+                    todo.link = $scope.linkAdd;
+                    console.log($scope.linkAdd);
+                    updateTodo(todo).then(function () {
+                        $scope.closeThisDialog();
+                    });
+                };
+            }]
+        })
+    };
+
+    $scope.editInfo = function (info) {
+        ngDialog.open({
+            template: 'infoDialog',
+            appendClassName: 'link-dialog',
+            controller: ['$scope', function ($scope) {
+                $scope.info = info;
+                $scope.submit = function () {
+                    console.log(info);
+                    updateInfo(info).then(function () {
+                        $scope.closeThisDialog();
+                    });
+                };
+            }]
+        })
+    };
+
+    $scope.info = {};
     $scope.todos = [];
+    $scope.donorName = localStorage.getItem('donorName') || '';
     $scope.doneNum = 0;
+    fetchInfo();
     fetchTodos();
     socket.on('server.change', fetchTodos);
 }]);
-app.config(['$httpProvider', function ($httpProvider) {
+app.config(['$httpProvider', 'ngDialogProvider', function ($httpProvider, ngDialogProvider) {
+    ngDialogProvider.setDefaults({
+        className: 'ngdialog-theme-default'
+    });
     $httpProvider.interceptors.push((function () {
         var interceptor = function ($timeout, $q) {
             return {
                 'response' : function (opt) {
-                    console.log(opt);
                     if (opt.config.method !== 'GET') {
                         socket.emit('client.change');
                     }

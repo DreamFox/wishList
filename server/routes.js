@@ -44,6 +44,7 @@ module.exports = function(app) {
                 $set: {
                     label: req.param('label'),
                     link: req.param('link'),
+                    donor: req.param('donor'),
                     checked: req.param('checked')
                 }
             }));

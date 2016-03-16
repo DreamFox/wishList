@@ -1,10 +1,7 @@
 (function () {
 var app = angular.module("todos", ['ngDialog']);
-var socket = io.connect('http://localhost:3000');
-socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-});
+var socket = io.connect('http://172.16.2.26:3000');
+
 app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
         function ($scope, $http, ngDialog) {
     function fetchTodos() {
@@ -24,6 +21,11 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
     }
 
     function updateTodo(todo) {
+        if (todo.checked) {
+            todo.donor = 'DreamFox';
+        } else {
+            todo.donor = '';
+        }
         return $http.put('/gift' + '/' + todo._id, todo);
     }
 
@@ -53,18 +55,18 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
             $scope.inputVal = '';
         });
     };
-    socket.on('server.add', function (todo) {
+    /*socket.on('server.add', function (todo) {
         console.log(todo);
         $scope.todos.push(todo);
         $scope.$apply();
-    });
-    socket.on('server.remove', function (todo) {
+    });*/
+    /*socket.on('server.remove', function (todo) {
         console.log(todo);
         $scope.todos = _.reject($scope.todos, function (one) {
             return one._id === todo._id;
         });
         $scope.$apply();
-    });
+    });*/
 
     $scope.destroy = function (todo) {
         removeTodo(todo).then(function () {
@@ -119,6 +121,7 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
     $scope.addLink = function (todo) {
         ngDialog.open({
             template: 'linkDialog',
+            appendClassName: 'link-dialog',
             controller: ['$scope', function ($scope) {
                 $scope.linkAdd = todo.link;
                 $scope.submit = function () {
@@ -135,6 +138,7 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
     $scope.editInfo = function (info) {
         ngDialog.open({
             template: 'infoDialog',
+            appendClassName: 'link-dialog',
             controller: ['$scope', function ($scope) {
                 $scope.info = info;
                 $scope.submit = function () {
@@ -154,7 +158,10 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
     fetchTodos();
     socket.on('server.change', fetchTodos);
 }]);
-app.config(['$httpProvider', function ($httpProvider) {
+app.config(['$httpProvider', 'ngDialogProvider', function ($httpProvider, ngDialogProvider) {
+    ngDialogProvider.setDefaults({
+        className: 'ngdialog-theme-default'
+    });
     $httpProvider.interceptors.push((function () {
         var interceptor = function ($timeout, $q) {
             return {
