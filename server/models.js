@@ -6,7 +6,8 @@ var _Gift = new Schema({
     id : String, 
     link: String,
     checked : Boolean,
-    donor: String
+    donor: String,
+    userId: String
 });
 var _Info = new Schema({
     user: String,

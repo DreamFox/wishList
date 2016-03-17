@@ -45,6 +45,7 @@ module.exports = function(app) {
                     label: req.param('label'),
                     link: req.param('link'),
                     donor: req.param('donor'),
+                    userId: req.param('userId'),
                     checked: req.param('checked')
                 }
             }));

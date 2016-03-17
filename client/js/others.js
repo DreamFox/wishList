@@ -5,8 +5,8 @@ socket.on('news', function (data) {
     console.log(data);
     socket.emit('my other event', { my: 'data' });
 });
-app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
-        function ($scope, $http, ngDialog) {
+app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
+        function ($scope, $http, ngDialog, $q) {
     function fetchTodos() {
         $http.get('/gift').success(function (res) {
             $scope.todos = res;
@@ -24,7 +24,15 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
     }
 
     function updateTodo(todo) {
-        return $http.put('/gift' + '/' + todo._id, todo);
+        if (!todo.userId) {
+            todo.userId = $scope.userId;
+        } else {
+            todo.userId = '';
+        }
+        return $http.put('/gift' + '/' + todo._id, todo).then(function (data) {
+            socket.emit('client.update', todo);
+            return $q.when(data);
+        });
     }
 
     function updateInfo(info) {
@@ -53,18 +61,28 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
             $scope.inputVal = '';
         });
     };
-    /*socket.on('server.add', function (todo) {
+    socket.on('server.add', function (todo) {
         console.log('add:', todo);
         $scope.todos.push(todo);
         $scope.$apply();
-    });*/
-    /*socket.on('server.remove', function (todo) {
+    });
+    socket.on('server.remove', function (todo) {
         console.log(todo);
         $scope.todos = _.reject($scope.todos, function (one) {
             return one._id === todo._id;
         });
         $scope.$apply();
-    });*/
+    });
+    socket.on('server.update', function (todo) {
+        console.log('update');
+        _.each($scope.todos, function (one) {
+            if (one._id === todo._id) {
+                angular.extend(one, todo);
+                console.log(one);
+            }
+        });
+        $scope.$apply();
+    });
 
     $scope.destroy = function (todo) {
         removeTodo(todo).then(function () {
@@ -73,44 +91,48 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
         });
     };
 
-    $scope.toggle = function (todo) {
-        if (todo.checked) {
-            ngDialog.openConfirm({
-                template: 'donorDialog',
-                scope: $scope,
-                appendClassName: 'donor-dialog',
-                controller: ['$scope', function ($scope) {
-                    $scope.submit = function () {
-                        todo.donor = $scope.donorName;
-                        console.log(todo.donor);
-                        updateTodo(todo).then(function () {
-                            $scope.confirm($scope.donorName);
+    $scope.give = function (todo) {
+        ngDialog.openConfirm({
+            template: 'donorDialog',
+            scope: $scope,
+            appendClassName: 'donor-dialog',
+            controller: ['$scope', function ($scope) {
+                $scope.submit = function () {
+                    if (todo.checked) {
+                        ngDialog.open({
+                            template: '<p class="hint">抱歉，已经被人抢先领取</p>',
+                            plain: true
                         });
-                    };
-                }]
-            }).then(function (name) {
-                $scope.donorName = name;
-                localStorage.setItem('donorName', name);
-                ngDialog.open({
-                    template: '<p class="hint">页面底部可以看到DreamFox的收货地址喔</p>',
-                    plain: true
-                });
-            }).catch(function () {
-                todo.checked = false;
+                        $scope.closeThisDialog();
+                        return;
+                    }
+                    todo.donor = $scope.donorName;
+                    console.log(todo.donor);
+                    todo.checked = true;
+                    updateTodo(todo).then(function () {
+                        $scope.confirm($scope.donorName);
+                    });
+                };
+            }]
+        }).then(function (name) {
+            $scope.donorName = name;
+            localStorage.setItem('donorName', name);
+            ngDialog.open({
+                template: '<p class="hint">页面底部可以看到DreamFox的收货地址喔</p>',
+                plain: true
             });
-        } else {
-            var donor = localStorage.getItem('donorName');
-            if (donor && donor == todo.donor) {
-                todo.donor = '';
-                updateTodo(todo);
-            } else if (todo.donor) {
-                todo.checked = true;
-                ngDialog.open({
-                    template: '<p class="hint">抱歉，不是您认领的心愿不能取消</p>',
-                    plain: true
-                });
-            }
-        }
+        });
+    };
+
+    $scope.giveUp = function (todo) {
+        todo.checked = false;
+        todo.donor = '';
+        updateTodo(todo).then(function () {
+            ngDialog.open({
+                template: '<p class="hint">您已经放弃认领该心愿，欢迎认领其他心愿</p>',
+                plain: true
+            });
+        })
     };
 
     $scope.toggleAll = function (checked) {
@@ -142,33 +164,6 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
         });
     };
 
-    $scope.updateLabel = function($event, todo) {
-        if ($event.keyCode !== 13 &&
-                $event.type !== 'blur') {
-            return;
-        }
-        updateTodo(todo).then(function () {
-            todo.edit = false;
-        });
-    };
-
-    $scope.addLink = function (todo) {
-        ngDialog.open({
-            template: 'linkDialog',
-            appendClassName: 'link-dialog',
-            controller: ['$scope', function ($scope) {
-                $scope.linkAdd = todo.link;
-                $scope.submit = function () {
-                    todo.link = $scope.linkAdd;
-                    console.log($scope.linkAdd);
-                    updateTodo(todo).then(function () {
-                        $scope.closeThisDialog();
-                    });
-                };
-            }]
-        })
-    };
-
     $scope.editInfo = function (info) {
         ngDialog.open({
             template: 'infoDialog',
@@ -188,6 +183,11 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
     $scope.info = {};
     $scope.todos = [];
     $scope.donorName = localStorage.getItem('donorName') || '';
+    $scope.userId = localStorage.getItem('userId');
+    if (!$scope.userId) {
+        $scope.userId = String(Date.now() + Math.random());
+        localStorage.setItem('userId', $scope.userId);
+    }
     $scope.doneNum = 0;
     fetchInfo();
     fetchTodos();
@@ -201,10 +201,6 @@ app.config(['$httpProvider', 'ngDialogProvider', function ($httpProvider, ngDial
         var interceptor = function ($timeout, $q) {
             return {
                 'response' : function (opt) {
-                    if (opt.config.method !== 'GET') {
-                        socket.emit('client.change');
-                    }
-                    //socket.emit('client.change');
                     return opt;
                 }
             };

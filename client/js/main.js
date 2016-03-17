@@ -24,8 +24,10 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
         if (todo.checked) {
             todo.donor = 'DreamFox';
         } else {
+            todo.userId = '';
             todo.donor = '';
         }
+        socket.emit('client.update', todo);
         return $http.put('/gift' + '/' + todo._id, todo);
     }
 
@@ -55,18 +57,28 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
             $scope.inputVal = '';
         });
     };
-    /*socket.on('server.add', function (todo) {
+    socket.on('server.add', function (todo) {
         console.log(todo);
         $scope.todos.push(todo);
         $scope.$apply();
-    });*/
-    /*socket.on('server.remove', function (todo) {
+    });
+    socket.on('server.remove', function (todo) {
         console.log(todo);
         $scope.todos = _.reject($scope.todos, function (one) {
             return one._id === todo._id;
         });
         $scope.$apply();
-    });*/
+    });
+    socket.on('server.update', function (todo) {
+        console.log('update');
+        _.each($scope.todos, function (one) {
+            if (one._id === todo._id) {
+                angular.extend(one, todo);
+                console.log(one);
+            }
+        });
+        $scope.$apply();
+    });
 
     $scope.destroy = function (todo) {
         removeTodo(todo).then(function () {
@@ -156,7 +168,6 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
     $scope.doneNum = 0;
     fetchInfo();
     fetchTodos();
-    socket.on('server.change', fetchTodos);
 }]);
 app.config(['$httpProvider', 'ngDialogProvider', function ($httpProvider, ngDialogProvider) {
     ngDialogProvider.setDefaults({
@@ -166,11 +177,6 @@ app.config(['$httpProvider', 'ngDialogProvider', function ($httpProvider, ngDial
         var interceptor = function ($timeout, $q) {
             return {
                 'response' : function (opt) {
-                    console.log(opt);
-                    if (opt.config.method !== 'GET') {
-                        socket.emit('client.change');
-                    }
-                    //socket.emit('client.change');
                     return opt;
                 }
             };

@@ -251,3 +251,14 @@ button {
     color: #fff;
     background: #0094FF;
 }
+.btns[disabled='disabled'] {
+    background: #aaa;
+}
+.give-btn {
+    min-width: 50px;
+    margin: 0;
+    width: 60px;
+    height: 30px;
+    line-height: 30px;
+    vertical-align: top;
+}

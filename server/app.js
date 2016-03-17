@@ -20,10 +20,10 @@ require('./routes')(app);
 
 io.sockets.on('connection', function (socket) {
     //发送消息给客户端
-    console.log('a user connected');
+    console.log('a user connected', socket.id);
     //连接成功则执行下面的监听
-    socket.on('client.change', function (data) {
-        socket.broadcast.emit('server.change', data);
+    socket.on('client.update', function (data) {
+        socket.broadcast.emit('server.update', data);
     });
     socket.on('client.add', function (data) {
         socket.broadcast.emit('server.add', data);
