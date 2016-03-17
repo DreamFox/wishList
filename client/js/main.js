@@ -162,34 +162,40 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
             }]
         })
     };
-    ngDialog.openConfirm({
-        template: 'loginDialog',
-        appendClassName: 'login-dialog',
-        controller: ['$scope', function ($scope) {
-            $scope.submit = function () {
-                $http.post('/login', {
-                    user: $scope.user,
-                    pass: $scope.pass
-                }).then(function () {
-                    $scope.confirm();
-                }).catch(function () {
-                    $scope.closeThisDialog();
-                })
-            };
-        }]
-    }).then(function () {
-        $scope.logined = true;
-        $scope.info = {};
-        $scope.todos = [];
-        $scope.doneNum = 0;
-        fetchInfo();
-        fetchTodos();
-    }).catch(function () {
-        ngDialog.open({
-            template: '<p class="hint">帐号密码错误</p>',
-            plain: true
-        });
-    })
+
+    function login() {
+        ngDialog.openConfirm({
+            template: 'loginDialog',
+            appendClassName: 'login-dialog',
+            controller: ['$scope', function ($scope) {
+                $scope.submit = function () {
+                    $http.post('/login', {
+                        user: $scope.user,
+                        pass: $scope.pass
+                    }).then(function () {
+                        $scope.confirm();
+                    }).catch(function () {
+                        $scope.closeThisDialog();
+                    })
+                };
+            }]
+        }).then(function () {
+            $scope.logined = true;
+            $scope.info = {};
+            $scope.todos = [];
+            $scope.doneNum = 0;
+            fetchInfo();
+            fetchTodos();
+        }).catch(function () {
+            ngDialog.open({
+                template: '<p class="hint">帐号密码错误</p>',
+                plain: true
+            }).closePromise.then(function () {
+                login();
+            });
+        })
+    }
+    login();
 }]);
 app.config(['$httpProvider', 'ngDialogProvider', function ($httpProvider, ngDialogProvider) {
     ngDialogProvider.setDefaults({
