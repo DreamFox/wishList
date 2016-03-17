@@ -96,5 +96,13 @@ module.exports = function(app) {
                 }));
             });
         });
-
+    app.route('/login').post(function (req, res) {
+        var userName = req.param('user');
+        var password = req.param('pass');
+        if (userName == 'admin' && password == 'df') {
+            res.json(200, 'ok');
+        } else {
+            res.json(500, 'error');
+        }
+    });
 };

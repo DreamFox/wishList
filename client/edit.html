@@ -18,7 +18,7 @@
 
 <body ng-app="todos" ng-controller="todoCtrl">
 
-    <div id="todoapp" >
+    <div id="todoapp" ng-if="logined">
 
         <header>
             <h1>梦想心愿单</h1>
@@ -51,7 +51,7 @@
 
     </div>
 
-    <div id="instructions" >
+    <div id="instructions" ng-if="logined">
     <p class="btns" ng-click="editInfo(info)">编辑个人信息</p>
     <div class="personal-info">
         <p ng-bind="'姓名：' + info.name"></p>
@@ -60,7 +60,7 @@
     </div>
     </div>
     
-    <div id="credits">
+    <div id="credits" ng-if="logined">
         Created by DreamFox
     </div>
     <script type="text/ng-template" id="linkDialog">
@@ -68,6 +68,13 @@
         <input type="text" class="dialog-text" ng-model="linkAdd" />
         <br/>
         <button class="confirm btns" ng-click="submit()">确定</button>
+    </script>
+    <script type="text/ng-template" id="loginDialog">
+        <p class="item-label">账号</p>
+        <input type="text" class="dialog-text" ng-model="user" />
+        <p class="item-label">密码</p>
+        <input type="password" class="dialog-text" ng-model="pass" />
+        <button class="confirm btns" ng-click="submit()">登录</button>
     </script>
     <script type="text/ng-template" id="infoDialog">
         <p class="item-label">姓名</p>
