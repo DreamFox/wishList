@@ -16,13 +16,13 @@
      <!-- endbuild -->
 </head>
 
-<body ng-app="todos" ng-controller="todoCtrl">
+<body ng-app="todos" ng-controller="todoCtrl as gift">
 
     <div id="todoapp" ng-if="logined">
 
         <header>
             <h1>梦想心愿单</h1>
-            <input id="new-todo" type="text" placeholder="添加一个心愿" ng-keypress="save($event)" ng-model="inputVal"></header>
+            <input id="new-todo" type="text" placeholder="添加一个心愿" ng-keypress="save($event, gift.inputVal)" ng-model="gift.inputVal"></header>
 
         <section id="main" ng-show="todos.length">
             <input id="toggle-all" type="checkbox" ng-click="toggleAll(markAll)" ng-model="markAll">

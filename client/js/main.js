@@ -4,6 +4,7 @@ var socket = io.connect('http://172.16.2.26:3000');
 
 app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
         function ($scope, $http, ngDialog) {
+    var that = this;
     function fetchTodos() {
         $http.get('/gift').success(function (res) {
             $scope.todos = res;
@@ -36,25 +37,25 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
         return $http.put('/info/dreamfox', info);
     }
 
-    $scope.save = function ($event) {
-        if ($event.keyCode !== 13 || !$scope.inputVal) {
+    $scope.save = function ($event, inputVal) {
+        if ($event.keyCode !== 13 || !inputVal) {
             return;
         }
         $http.post('/gift', {
-            label: $scope.inputVal,
+            label: inputVal,
             checked: false
         }).success(function (todo) {
             $scope.todos.push({
                 _id: todo._id,
-                label: $scope.inputVal,
+                label: inputVal,
                 checked: false
             });
             socket.emit('client.add', {
                 _id: todo._id,
-                label: $scope.inputVal,
+                label: inputVal,
                 checked: false
             });
-            $scope.inputVal = '';
+            that.inputVal = '';
         });
     };
     socket.on('server.add', function (todo) {
