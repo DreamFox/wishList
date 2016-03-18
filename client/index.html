@@ -27,7 +27,7 @@
             <p class="hint">以下是DreamFox最近的心愿单</p>
             <p class="hint">你可以选择认领，并实现他的愿望</p>
         </div>
-        <section id="main" ng-show="todos.length">
+        <section id="main" ng-class="{'show': todos.length > 0}">
             <ul id="todo-list">
                 <li ng-class="{done: todo.checked, editing: todo.edit}" ng-repeat="todo in todos">
                     <div class="view">
@@ -79,10 +79,10 @@
         <button class="confirm btns" ng-click="submit()">提交</button>
     </script>
     <!-- build:js others.js -->
-    <script type="text/javascript" src="js/underscore.js"></script>
-    <script type="text/javascript" src="js/angular.js"></script>
+    <script type="text/javascript" src="js/underscore.min.js"></script>
+    <script type="text/javascript" src="js/angular.min.js"></script>
     <script type="text/javascript" src="js/ngDialog.js"></script>
-    <script type="text/javascript" src="js/socket.io.js"></script>
+    <script type="text/javascript" src="js/socket.io.min.js"></script>
     <script type="text/javascript" src="js/others.js"></script>
     <!-- endbuild -->
 </body>

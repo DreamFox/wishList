@@ -10,6 +10,7 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
     function fetchTodos() {
         $http.get('/gift').success(function (res) {
             $scope.todos = res;
+            console.log($scope.todos);
         });
     }
     function fetchInfo() {

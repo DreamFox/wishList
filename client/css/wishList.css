@@ -33,7 +33,12 @@ body {
     -o-border-radius: 0 0 5px 5px;
     border-radius: 0 0 5px 5px;
 }
-
+#main {
+    display: none;
+}
+#main.show {
+    display: block;
+}
 #todoapp h1 {
     font-size: 36px;
     font-weight: bold;

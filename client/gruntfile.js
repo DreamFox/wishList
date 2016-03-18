@@ -35,6 +35,13 @@ module.exports = function(grunt) {
                 ]
             }
         },
+        uglify: {
+            release: {//任务四：合并压缩a.js和b.js
+                files: {
+                    'js/socket.io.min.js': ['js/socket.io.js']
+                }
+            }
+        },
         usemin:{
             html : {
                 files : [{
@@ -54,6 +61,7 @@ module.exports = function(grunt) {
     // 加载插件
     require('load-grunt-tasks')(grunt);
 
+    grunt.registerTask('compress', ['uglify:release']);
     // 默认被执行的任务列表。
     grunt.registerTask('default', ['clean:beforebuild', 'copy', 'useminPrepare',
         'concat', 'cssmin', 'uglify', 'usemin']);

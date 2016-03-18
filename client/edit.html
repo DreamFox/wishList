@@ -24,7 +24,7 @@
             <h1>梦想心愿单</h1>
             <input id="new-todo" type="text" placeholder="添加一个心愿" ng-keypress="save($event, gift.inputVal)" ng-model="gift.inputVal"></header>
 
-        <section id="main" ng-show="todos.length">
+        <section id="main" ng-class="{'show': todos.length > 0}">
             <input id="toggle-all" type="checkbox" ng-click="toggleAll(markAll)" ng-model="markAll">
             <label for="toggle-all">都实现了</label>
             <ul id="todo-list">
@@ -87,8 +87,8 @@
         <button class="confirm btns" ng-click="submit()">提交</button>
     </script>
     <!-- build:js main.js -->
-    <script type="text/javascript" src="js/underscore.js"></script>
-    <script type="text/javascript" src="js/angular.js"></script>
+    <script type="text/javascript" src="js/underscore.min.js"></script>
+    <script type="text/javascript" src="js/angular.min.js"></script>
     <script type="text/javascript" src="js/ngDialog.js"></script>
     <script type="text/javascript" src="js/socket.io.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
