@@ -31,7 +31,7 @@
             <p class="hint">3月20号是DreamFox的生日</p>
             <p class="hint">他开发了这个网站作为送给自己的生日礼物</p>
             <p class="hint">以下是DreamFox最近的心愿单</p>
-            <p class="hint">你可以点击“认领”以实现他的愿望</p>
+            <p class="hint">作为朋友你可以点击“认领”以完成他的心愿</p>
         </div>
         <section id="main" ng-class="{'show': todos.length > 0}">
             <ul id="todo-list">
@@ -78,7 +78,7 @@
         {{gift.message}}
     </div>
     <script type="text/ng-template" id="donorDialog">
-        <p class="item-label">太感谢了！确认认领的话请留下您的大名，我会永记于心的</p>
+        <p class="item-label">太感谢了！确认认领的话请留下您的姓名，让DreamFox知道你是谁</p>
         <input type="text" class="dialog-text" ng-model="donorName" />
         <br/>
         <button class="confirm btns" ng-click="submit()">确定</button>
