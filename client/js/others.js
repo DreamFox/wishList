@@ -1,11 +1,10 @@
 (function () {
 var app = angular.module("todos", ['ngDialog']);
-var socket = io.connect('http://172.16.2.26:3000');
-socket.on('user.add', function (data) {
-    console.log('user.add', data);
-});
+var socket = io.connect('http://localhost:3000');
+var tid = null;
 app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
         function ($scope, $http, ngDialog, $q) {
+    var that = this;
     function fetchTodos() {
         $http.get('/gift').success(function (res) {
             $scope.todos = res;
@@ -61,28 +60,6 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
             $scope.inputVal = '';
         });
     };
-    socket.on('server.add', function (todo) {
-        console.log('add:', todo);
-        $scope.todos.push(todo);
-        $scope.$apply();
-    });
-    socket.on('server.remove', function (todo) {
-        console.log(todo);
-        $scope.todos = _.reject($scope.todos, function (one) {
-            return one._id === todo._id;
-        });
-        $scope.$apply();
-    });
-    socket.on('server.update', function (todo) {
-        console.log('update');
-        _.each($scope.todos, function (one) {
-            if (one._id === todo._id) {
-                angular.extend(one, todo);
-                console.log(one);
-            }
-        });
-        $scope.$apply();
-    });
 
     $scope.destroy = function (todo) {
         removeTodo(todo).then(function () {
@@ -92,6 +69,7 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
     };
 
     $scope.give = function (todo) {
+        socket.emit('client.openlink', todo.label);
         ngDialog.openConfirm({
             template: 'donorDialog',
             scope: $scope,
@@ -195,11 +173,54 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
     $scope.doneNum = 0;
     fetchInfo();
     fetchTodos();
+
+    socket.on('server.add', function (todo) {
+        console.log('add:', todo);
+        $scope.todos.push(todo);
+        $scope.$apply();
+    });
+    socket.on('server.remove', function (todo) {
+        console.log(todo);
+        $scope.todos = _.reject($scope.todos, function (one) {
+            return one._id === todo._id;
+        });
+        $scope.$apply();
+    });
+    socket.on('server.update', function (todo) {
+        console.log('update');
+        _.each($scope.todos, function (one) {
+            if (one._id === todo._id) {
+                angular.extend(one, todo);
+                console.log(one);
+            }
+        });
+        $scope.$apply();
+    });
     socket.on('server.change', fetchTodos);
 
     socket.on('server.openlink', function (name) {
         console.log(name);
+        showTip('有人查看了心愿“' + name + '”');
     });
+    socket.on('user.add', function (data) {
+        console.log('user.add', data);
+        showTip('有新用户访问心愿单');
+    });
+
+    function showTip(message) {
+        $scope.$apply(function () {
+            that.message = message;
+            that.messageShow = true;
+            if (tid) {
+                clearTimeout(tid);
+            }
+            tid = setTimeout(function () {
+                that.messageShow = false;
+                tid = null;
+                $scope.$apply();
+            }, 3000);    
+        });
+    }
 }]);
 app.config(['$httpProvider', 'ngDialogProvider', function ($httpProvider, ngDialogProvider) {
     ngDialogProvider.setDefaults({

@@ -1,6 +1,6 @@
 (function () {
 var app = angular.module("todos", ['ngDialog']);
-var socket = io.connect('http://172.16.2.26:3000');
+var socket = io.connect('http://localhost:3000');
 
 app.controller("todoCtrl", ["$scope", "$http", "ngDialog",
         function ($scope, $http, ngDialog) {
