@@ -37,8 +37,8 @@
             <ul id="todo-list">
                 <li ng-class="{done: todo.checked, editing: todo.edit}" ng-repeat="todo in todos">
                     <div class="view">
-                        <button class="confirm btns give-btn" ng-click="give(todo)" ng-class="{'disabled' : todo.checked}" ng-disabled="todo.checked && todo.donor" ng-if="!todo.checked">认领</button>
-                        <button class="confirm btns give-btn" ng-click="giveUp(todo)" ng-if="todo.checked && todo.userId == userId">放弃</button>
+                        <a class="confirm btns give-btn" ng-click="give(todo)" ng-class="{'disabled' : todo.checked}" ng-disabled="todo.checked && todo.donor" ng-if="!todo.checked">认领</a>
+                        <a class="confirm btns give-btn" ng-click="giveUp(todo)" ng-if="todo.checked && todo.userId == userId">放弃</a>
                         <label ng-bind="todo.label"></label>
                         <span class="donor" ng-show="todo.donor">({{todo.userId == userId ? '您已认领' : '已被认领'}})</span>
                         <a href="{{todo.link}}" target="_blank" class="gift-link" ng-if="todo.link" ng-click="logOpen(todo.label)">商品链接</a>
@@ -81,7 +81,7 @@
         <p class="item-label">太感谢了！确认认领的话请留下您的姓名，让DreamFox知道你是谁</p>
         <input type="text" class="dialog-text" ng-model="donorName" />
         <br/>
-        <button class="confirm btns" ng-click="submit()">确定</button>
+        <a class="confirm btns" ng-click="submit()">确定</a>
     </script>
     <script type="text/ng-template" id="infoDialog">
         <p class="item-label">姓名</p>
@@ -91,7 +91,7 @@
         <p class="item-label">收货地址</p>
         <input type="text" class="dialog-text" ng-model="info.address" />
         <br/>
-        <button class="confirm btns" ng-click="submit()">提交</button>
+        <a class="confirm btns" ng-click="submit()">提交</a>
     </script>
     <!-- build:js others.js -->
     <script type="text/javascript" src="js/underscore.min.js"></script>
