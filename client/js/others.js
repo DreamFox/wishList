@@ -1,9 +1,8 @@
 (function () {
 var app = angular.module("todos", ['ngDialog']);
 var socket = io.connect('http://172.16.2.26:3000');
-socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
+socket.on('user.add', function (data) {
+    console.log('user.add');
 });
 app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
         function ($scope, $http, ngDialog, $q) {
@@ -181,6 +180,10 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
         })
     };
 
+    $scope.logOpen = function (name) {
+        socket.on('client.openlink', name);
+    };
+
     $scope.info = {};
     $scope.todos = [];
     $scope.donorName = localStorage.getItem('donorName') || '';
@@ -193,6 +196,10 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
     fetchInfo();
     fetchTodos();
     socket.on('server.change', fetchTodos);
+
+    socket.on('server.openlink', function (name) {
+        console.log(name);
+    });
 }]);
 app.config(['$httpProvider', 'ngDialogProvider', function ($httpProvider, ngDialogProvider) {
     ngDialogProvider.setDefaults({

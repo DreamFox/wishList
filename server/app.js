@@ -21,6 +21,7 @@ require('./routes')(app);
 io.sockets.on('connection', function (socket) {
     //发送消息给客户端
     console.log('a user connected', socket.id);
+    socket.broadcast.emit('user.add');
     //连接成功则执行下面的监听
     socket.on('client.update', function (data) {
         socket.broadcast.emit('server.update', data);
@@ -30,6 +31,9 @@ io.sockets.on('connection', function (socket) {
     });
     socket.on('client.remove', function (data) {
         socket.broadcast.emit('server.remove', data);
+    });
+    socket.on('client.openlink', function (data) {
+        socket.broadcast.emit('server.openlink', data);
     });
     //断开连接callback
     socket.on('disconnect', function() {
