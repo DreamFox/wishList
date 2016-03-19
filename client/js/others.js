@@ -2,7 +2,7 @@
 var app = angular.module("todos", ['ngDialog']);
 var socket = io.connect('http://172.16.2.26:3000');
 socket.on('user.add', function (data) {
-    console.log('user.add');
+    console.log('user.add', data);
 });
 app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
         function ($scope, $http, ngDialog, $q) {
@@ -181,7 +181,7 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
     };
 
     $scope.logOpen = function (name) {
-        socket.on('client.openlink', name);
+        socket.emit('client.openlink', name);
     };
 
     $scope.info = {};
