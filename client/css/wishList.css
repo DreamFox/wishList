@@ -27,7 +27,8 @@ body {
     left: 50%;
     -webkit-transform: translate(-50% , 0);
     transform: translate(-50% , 0);
-    background: rgba(51, 148, 226, 0.5);
+    background: #0094FF;
+    color: #fff;
     border-radius: 5px;
 }
 .message-tip.show {
