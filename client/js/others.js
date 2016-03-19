@@ -7,6 +7,9 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
     var that = this;
     function fetchTodos() {
         $http.get('/gift').success(function (res) {
+            res.sort(function (a, b) {
+                return a.checked - b.checked;
+            });
             $scope.todos = res;
             console.log($scope.todos);
         });
