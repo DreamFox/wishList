@@ -18,6 +18,9 @@ body {
 .hint {
     text-align: center;
 }
+.gift-link {
+    color: #0094ff;
+}
 .message-tip {
     display: none;
     padding: 10px 20px;

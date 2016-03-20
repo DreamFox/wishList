@@ -42,7 +42,7 @@
                         <a class="confirm btns give-btn" ng-click="giveUp(todo)" ng-if="todo.checked && todo.userId == userId">放弃</a>
                         <label ng-bind="todo.label"></label>
                         <span class="donor" ng-show="todo.donor">({{todo.userId == userId ? '您已认领' : '已被认领'}})</span>
-                        <a href="{{todo.link}}" target="_blank" class="gift-link" ng-if="todo.link" ng-click="logOpen(todo.label)">商品链接</a>
+                        <a class="gift-link" ng-if="todo.link" ng-click="logOpen(todo)">商品链接</a>
                     </div>
                 </li>
             </ul>

@@ -161,8 +161,10 @@ app.controller("todoCtrl", ["$scope", "$http", "ngDialog", "$q",
         })
     };
 
-    $scope.logOpen = function (name) {
-        socket.emit('client.openlink', name);
+    $scope.logOpen = function (todo) {
+        console.log(todo.link);
+        window.open(todo.link, '_blank');
+        socket.emit('client.openlink', todo.label);
     };
 
     $scope.info = {};
